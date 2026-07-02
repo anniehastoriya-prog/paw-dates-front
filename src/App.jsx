@@ -4,12 +4,9 @@ import Login from "./auth/Login";
 import Register from "./auth/Register";
 import WelcomePage from "./pages/WelcomePage";
 import SearchPage from "./pages/Search";
-import DogPage from "./pages/DogPage";
+import DogsPage from "./pages/DogsPage";
 import UserPage from "./pages/UserPage";
 import Messages from "./pages/Messages";
-
-/** Import the new user profile page*/
-import UserPage from "./pages/UserPage";
 
 export default function App() {
   return (
@@ -21,7 +18,7 @@ export default function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/profile" element={<UserPage />} />
         <Route path="/users/:id" element={<UserPage />} />
-        <Route path="/dogs/:dogId" element={<DogPage />} />
+        <Route path="/dogs/:dogId" element={<DogsPage />} />
         <Route path="/messages" element={<Messages />} />
       </Route>
     </Routes>

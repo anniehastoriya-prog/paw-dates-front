@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function DogCard({ dog }) {
   const goToPage = useNavigate();

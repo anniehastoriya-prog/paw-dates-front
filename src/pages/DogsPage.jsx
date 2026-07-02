@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
+import { useParams, useNavigate } from "react-router";
 import MessagePopup from "../components/MessagePopup";
 import PlaydateRequestPopup from "../components/PlaydateRequestPopup";
 import { loadDogById } from "../api/dogs";
@@ -7,7 +8,7 @@ import { loadDogById } from "../api/dogs";
 export default function DogPage() {
   const { dogId } = useParams();
   const goToPage = useNavigate();
-  const token = localStorage.getItem("token");
+  const { token } = useAuth();
 
   const [dog, setDog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -81,18 +82,26 @@ export default function DogPage() {
         {dog.ratings.map((r) => (
           <div key={r.id}>
             <p>
-              <p>
-                {r.authorName}: {r.stars} paws
-              </p>
+              {r.authorName}: {r.stars} paws
             </p>
             <p>{r.message}</p>
           </div>
         ))}
       </div>
 
-      {showMessage && <MessagePopup dog={dog} onClose={closeMessage} />}
+      {showMessage && (
+        <MessagePopup
+          receiverId={dog.owner.id}
+          messages={[]}
+          onClose={closeMessage}
+        />
+      )}
       {showPlaydateRequest && (
-        <PlaydateRequestPopup dog={dog} onClose={closePlaydateRequest} />
+        <PlaydateRequestPopup
+          requestDogId={null}
+          recipientDogId={dog.id}
+          onClose={closePlaydateRequest}
+        />
       )}
     </section>
   );
