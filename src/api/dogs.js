@@ -1,4 +1,16 @@
-import { API } from "./config";
+const API = import.meta.env.VITE_API;
+
+//user loads all dogs when they open the search page
+export async function getDogs() {
+  try {
+    const response = await fetch(API + "/dogs");
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
 
 export async function loadDogById(token, id) {
   const response = await fetch(`${API}/dogs/${id}`, {
