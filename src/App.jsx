@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import Layout from "./layout/Layout";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
+import DogPage from "./pages/DogPage";
 
 /** Import the new user profile page*/
 import UserPage from "./pages/UserPage";
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<UserPage />} />
         <Route path="/users/:id" element={<UserPage />} />
+        <Route path="/dogs/:dogId" element={<DogPage />} />
       </Route>
     </Routes>
   );
