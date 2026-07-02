@@ -4,6 +4,9 @@ import Login from "./auth/Login";
 import Register from "./auth/Register";
 import DogPage from "./pages/DogPage";
 
+/** Import the new user profile page*/
+import UserPage from "./pages/UserPage";
+
 export default function App() {
   return (
     <Routes>
@@ -11,6 +14,8 @@ export default function App() {
         <Route index element={<p>Home page</p>} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<UserPage />} />
+        <Route path="/users/:id" element={<UserPage />} />
         <Route path="/dogs/:dogId" element={<DogPage />} />
       </Route>
     </Routes>
