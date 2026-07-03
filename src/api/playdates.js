@@ -19,19 +19,23 @@ export async function getPlaydates(token) {
 
 //user sends a playdate request to another users dog
 //stored in the database for the recipient to see
-export async function createPlaydate(token, { requestDogId, recipientDogId }) {
+export async function createPlaydate(
+  token,
+  { requestDogId, recipientDogId, timeslot },
+) {
   const response = await fetch(API + "/playdates", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    body: JSON.stringify({ requestDogId, recipientDogId }),
+    body: JSON.stringify({ requestDogId, recipientDogId, timeslot }),
   });
+  const result = await response.json();
   if (!response.ok) {
-    const result = await response.json();
     throw Error(result.message);
   }
+  return result;
 }
 
 //user can accept or decline a playdate request

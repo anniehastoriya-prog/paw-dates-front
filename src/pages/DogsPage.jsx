@@ -3,7 +3,13 @@ import { useAuth } from "../auth/AuthContext";
 import { useParams, useNavigate } from "react-router";
 import MessagePopup from "../components/MessagePopup";
 import PlaydateRequestPopup from "../components/PlaydateRequestPopup";
-import { loadDogById } from "../api/dogs";
+import {
+  loadDogById,
+  loadDogPhotos,
+  uploadDogPhoto,
+  deleteDogPhoto,
+} from "../api/dogs";
+import { loadMyProfile } from "../api/users";
 
 export default function DogPage() {
   const { dogId } = useParams();
@@ -11,6 +17,9 @@ export default function DogPage() {
   const { token } = useAuth();
 
   const [dog, setDog] = useState(null);
+  const [photos, setPhotos] = useState([]);
+  const [myUserId, setMyUserId] = useState(null);
+  const [myDogs, setMyDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const [showPlaydateRequest, setShowPlaydateRequest] = useState(false);
@@ -21,7 +30,18 @@ export default function DogPage() {
       setDog(data);
       setLoading(false);
     }
+    async function fetchPhotos() {
+      const data = await loadDogPhotos(token, dogId);
+      setPhotos(data);
+    }
+    async function fetchMe() {
+      const data = await loadMyProfile(token);
+      setMyUserId(data.id);
+      setMyDogs(data.dogs || []);
+    }
     fetchDog();
+    fetchPhotos();
+    fetchMe();
   }, [token, dogId]);
 
   function clickMessage() {
@@ -48,45 +68,101 @@ export default function DogPage() {
     document.getElementById("reviews").scrollIntoView();
   }
 
+  async function tryUploadPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      await uploadDogPhoto(token, dogId, file);
+      const data = await loadDogPhotos(token, dogId);
+      setPhotos(data);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function tryDeletePhoto(photoId) {
+    try {
+      await deleteDogPhoto(token, dogId, photoId);
+      const data = await loadDogPhotos(token, dogId);
+      setPhotos(data);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
   if (loading) return <p>Loading...</p>;
 
   return (
     <section>
       <div className="dog-header">
         <div className="dog-pfp">
-          <img src={dog.profilePic} alt={dog.name} />
+          {dog.profile_pic && (
+            <img
+              src={import.meta.env.VITE_API + dog.profile_pic}
+              alt={dog.name}
+            />
+          )}
         </div>
 
         <div className="dog-info">
           <h1>{dog.name}</h1>
           <p>
-            {dog.breed}, {dog.age} yrs, {dog.distance} mi away
+            {dog.breed}, {dog.age} yrs
           </p>
 
-          <button onClick={clickRating}>{dog.rating} paws</button>
+          <button onClick={clickRating}>{dog.ratings} paws</button>
 
           <p>{dog.description}</p>
 
-          <button onClick={clickMessage}>Message</button>
-          <button onClick={clickPlaydateRequest}>Request Playdate</button>
+          {dog.owner.id !== myUserId && (
+            <>
+              <button onClick={clickMessage}>Message</button>
+              <button onClick={clickPlaydateRequest}>Request Playdate</button>
+            </>
+          )}
+          {dog.owner.id === myUserId && (
+            <button onClick={() => goToPage("/dogs/" + dog.id + "/edit")}>
+              Edit Dog
+            </button>
+          )}
         </div>
       </div>
 
+      <h2>Owner</h2>
       <div className="owner-info" onClick={clickOwner}>
-        <img src={dog.owner.profilePic} alt={dog.owner.username} />
+        {dog.owner.profilePic && (
+          <img
+            src={import.meta.env.VITE_API + dog.owner.profilePic}
+            alt={dog.owner.username}
+          />
+        )}
         <p>{dog.owner.username}</p>
+      </div>
+
+      <div className="dog-photos">
+        <h2>Photos</h2>
+        {dog.owner.id === myUserId && (
+          <label>
+            Add Photo
+            <input type="file" accept="image/*" onChange={tryUploadPhoto} />
+          </label>
+        )}
+        {photos.map((photo) => (
+          <div key={photo.id} className="dog-photo">
+            <img
+              src={import.meta.env.VITE_API + photo.image_url}
+              alt={dog.name}
+            />
+            {dog.owner.id === myUserId && (
+              <button onClick={() => tryDeletePhoto(photo.id)}>Delete</button>
+            )}
+          </div>
+        ))}
       </div>
 
       <div id="reviews">
         <h2>Reviews</h2>
-        {dog.ratings.map((r) => (
-          <div key={r.id}>
-            <p>
-              {r.authorName}: {r.stars} paws
-            </p>
-            <p>{r.message}</p>
-          </div>
-        ))}
+        <p>Reviews coming soon.</p>
       </div>
 
       {showMessage && (
@@ -98,7 +174,7 @@ export default function DogPage() {
       )}
       {showPlaydateRequest && (
         <PlaydateRequestPopup
-          requestDogId={null}
+          myDogs={myDogs}
           recipientDogId={dog.id}
           onClose={closePlaydateRequest}
         />

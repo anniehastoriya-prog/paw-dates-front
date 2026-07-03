@@ -1,19 +1,25 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { createPlaydate, updatePlaydateStatus } from "../api/playdates";
 
 //popup that lets user request a playdate from any page
 export default function PlaydateRequestPopup({
-  requestDogId,
+  myDogs,
   recipientDogId,
   onClose,
 }) {
   const { token } = useAuth();
+  const goToPage = useNavigate();
   const [error, setError] = useState(null);
   const [minimized, setMinimized] = useState(false);
   const [sent, setSent] = useState(false);
   const [playdateId, setPlaydateId] = useState(null);
   const [sentTime, setSentTime] = useState(null);
+  const [timeslot, setTimeslot] = useState("");
+  const [requestDogId, setRequestDogId] = useState(
+    myDogs.length > 0 ? myDogs[0].id : "",
+  );
 
   //user sends a playdate request to another dog owner
   //stored in database so recipient can accept or decline
@@ -23,6 +29,7 @@ export default function PlaydateRequestPopup({
       const result = await createPlaydate(token, {
         requestDogId,
         recipientDogId,
+        timeslot,
       });
       setPlaydateId(result.id);
       setSentTime(new Date().toLocaleTimeString());
@@ -62,12 +69,32 @@ export default function PlaydateRequestPopup({
     <article>
       <button onClick={() => setMinimized(true)}>_</button>
       <button onClick={onClose}>X</button>
+      <button onClick={() => goToPage("/messages")}>✉</button>
 
       <h2>Request Playdate</h2>
       {error && <p role="alert">{error}</p>}
 
       {!sent ? (
         <>
+          <label>
+            Which dog?
+            <select
+              value={requestDogId}
+              onChange={(e) => setRequestDogId(e.target.value)}
+            >
+              {myDogs.map((dog) => (
+                <option key={dog.id} value={dog.id}>
+                  {dog.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <input
+            type="date"
+            value={timeslot}
+            onChange={(e) => setTimeslot(e.target.value)}
+            required
+          />
           <button type="button" onClick={onClose}>
             Cancel
           </button>

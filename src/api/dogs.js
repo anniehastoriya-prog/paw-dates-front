@@ -12,11 +12,51 @@ export async function getDogs() {
   }
 }
 
+export async function createDog(token, { name, breed, age }) {
+  const response = await fetch(API + "/dogs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    body: JSON.stringify({ name, breed, age }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message);
+  return data;
+}
+
 export async function loadDogById(token, id) {
   const response = await fetch(`${API}/dogs/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
+  return data;
+}
+
+export async function loadDogPhotos(token, id) {
+  const response = await fetch(`${API}/dogs/${id}/photos`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await response.json();
+  return data;
+}
+
+export async function updateDog(
+  token,
+  id,
+  { name, breed, age, description, profile_pic },
+) {
+  const response = await fetch(`${API}/dogs/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, breed, age, description, profile_pic }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message);
   return data;
 }
 
@@ -46,4 +86,53 @@ export async function sendPlaydateRequest(token, dogId, message) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.message);
   return data;
+}
+
+export async function uploadDogPhoto(token, dogId, file) {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const response = await fetch(API + "/dogs/" + dogId + "/photos", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw Error(result.message);
+  }
+  return result;
+}
+
+export async function deleteDogPhoto(token, dogId, photoId) {
+  const response = await fetch(API + "/dogs/" + dogId + "/photos/" + photoId, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+  if (!response.ok) {
+    const result = await response.json();
+    throw Error(result.message);
+  }
+}
+
+export async function uploadDogProfilePic(token, dogId, file) {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const response = await fetch(API + "/dogs/" + dogId + "/profile-pic", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw Error(result.message);
+  }
+  return result;
 }
