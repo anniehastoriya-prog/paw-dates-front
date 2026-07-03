@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { loadMyProfile, updateMyProfile, uploadProfilePic } from "../api/users";
-import { createDog } from "../api/dogs";
+import { createDog, deleteDog } from "../api/dogs";
 
 export default function EditProfile() {
   const { token } = useAuth();
@@ -10,6 +10,7 @@ export default function EditProfile() {
 
   const [description, setDescription] = useState("");
   const [profilePic, setProfilePic] = useState("");
+  const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,17 +18,18 @@ export default function EditProfile() {
   const [dogBreed, setDogBreed] = useState("");
   const [dogAge, setDogAge] = useState("");
 
+  const syncProfile = async () => {
+    const data = await loadMyProfile(token);
+    setDescription(data.description || "");
+    setProfilePic(data.profile_pic || "");
+    setDogs(data.dogs || []);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const syncProfile = async () => {
-      const data = await loadMyProfile(token);
-      setDescription(data.description || "");
-      setProfilePic(data.profile_pic || "");
-      setLoading(false);
-    };
     syncProfile();
   }, [token]);
 
-  /** save the user's description and profile pic */
   const trySaveProfile = async (e) => {
     e.preventDefault();
     setError(null);
@@ -42,7 +44,6 @@ export default function EditProfile() {
     }
   };
 
-  /** upload a profile pic from the user's device */
   const tryUploadProfilePic = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -55,7 +56,6 @@ export default function EditProfile() {
     }
   };
 
-  /** add a new dog tied to the user's account */
   const tryAddDog = async (e) => {
     e.preventDefault();
     setError(null);
@@ -68,12 +68,25 @@ export default function EditProfile() {
       setDogName("");
       setDogBreed("");
       setDogAge("");
-      goToPage("/profile");
+      await syncProfile();
     } catch (err) {
       setError(err.message);
     }
   };
 
+  //user clicks delete, confirm before removing the dog from their profile
+  const tryDeleteDog = async (dog) => {
+    const confirmDelete = window.confirm("Remove " + dog.name + "?");
+    if (!confirmDelete) return;
+    setError(null);
+    try {
+      await deleteDog(token, dog.id);
+      const updatedDogs = dogs.filter((d) => d.id !== dog.id);
+      setDogs(updatedDogs);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -103,6 +116,31 @@ export default function EditProfile() {
           Cancel
         </button>
       </form>
+
+      <h2>My Dogs</h2>
+      {dogs.length > 0 ? (
+        <div className="dogs-list">
+          {dogs.map((dog) => (
+            <div key={dog.id} className="dog-card">
+              <div className="dog-pfp">
+                {dog.profile_pic ? (
+                  <img
+                    src={import.meta.env.VITE_API + dog.profile_pic}
+                    alt={dog.name}
+                  />
+                ) : (
+                  <span>{dog.name.charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <p className="dog-name">{dog.name}</p>
+              <p className="dog-age">{dog.age} yrs</p>
+              <button onClick={() => tryDeleteDog(dog)}>Delete</button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No dogs added yet.</p>
+      )}
 
       <h2>Add a Dog</h2>
       <form onSubmit={tryAddDog}>
