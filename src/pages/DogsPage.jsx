@@ -9,6 +9,7 @@ import {
   uploadDogPhoto,
   deleteDogPhoto,
 } from "../api/dogs";
+import { loadDogRatings, submitRating, deleteRating } from "../api/ratings";
 import { loadMyProfile } from "../api/users";
 
 export default function DogPage() {
@@ -18,6 +19,9 @@ export default function DogPage() {
 
   const [dog, setDog] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [ratings, setRatings] = useState([]);
+  const [newPaws, setNewPaws] = useState(5);
+  const [newComments, setNewComments] = useState("");
   const [myUserId, setMyUserId] = useState(null);
   const [myDogs, setMyDogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +38,10 @@ export default function DogPage() {
       const data = await loadDogPhotos(token, dogId);
       setPhotos(data);
     }
+    async function fetchRatings() {
+      const data = await loadDogRatings(dogId);
+      setRatings(data);
+    }
     async function fetchMe() {
       const data = await loadMyProfile(token);
       setMyUserId(data.id);
@@ -41,6 +49,7 @@ export default function DogPage() {
     }
     fetchDog();
     fetchPhotos();
+    fetchRatings();
     fetchMe();
   }, [token, dogId]);
 
@@ -85,6 +94,31 @@ export default function DogPage() {
       await deleteDogPhoto(token, dogId, photoId);
       const data = await loadDogPhotos(token, dogId);
       setPhotos(data);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function trySubmitRating(e) {
+    e.preventDefault();
+    try {
+      await submitRating(token, dogId, Number(newPaws), newComments);
+      setNewComments("");
+      setNewPaws(5);
+      const data = await loadDogRatings(dogId);
+      setRatings(data);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function tryDeleteRating(ratingId) {
+    const confirmDelete = window.confirm("Delete this review?");
+    if (!confirmDelete) return;
+    try {
+      await deleteRating(token, ratingId);
+      const data = await loadDogRatings(dogId);
+      setRatings(data);
     } catch (err) {
       alert(err.message);
     }
@@ -162,7 +196,51 @@ export default function DogPage() {
 
       <div id="reviews">
         <h2>Reviews</h2>
-        <p>Reviews coming soon.</p>
+
+        {Number(dog.owner.id) !== Number(myUserId) && (
+          <form onSubmit={trySubmitRating}>
+            <label>
+              Paws
+              <div className="paw-rating">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <span
+                    key={num}
+                    onClick={() => setNewPaws(num)}
+                    style={{
+                      cursor: "pointer",
+                      opacity: num <= newPaws ? 1 : 0.3,
+                    }}
+                  >
+                    🐾
+                  </span>
+                ))}
+              </div>
+            </label>
+            <textarea
+              value={newComments}
+              onChange={(e) => setNewComments(e.target.value)}
+              placeholder="Leave a review..."
+              required
+            />
+            <button type="submit">Submit Review</button>
+          </form>
+        )}
+
+        {ratings.length === 0 ? (
+          <p>No reviews yet.</p>
+        ) : (
+          ratings.map((r) => (
+            <div key={r.id}>
+              <p>
+                {r.authorName}: {r.paws} paws
+              </p>
+              <p>{r.comments}</p>
+              {r.author_id === myUserId && (
+                <button onClick={() => tryDeleteRating(r.id)}>Delete</button>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {showMessage && (

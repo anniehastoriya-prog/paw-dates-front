@@ -136,3 +136,16 @@ export async function uploadDogProfilePic(token, dogId, file) {
   }
   return result;
 }
+
+export async function deleteDog(token, id) {
+  const response = await fetch(API + "/dogs/" + id, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+  if (!response.ok) {
+    const result = await response.json();
+    throw Error(result.message);
+  }
+}

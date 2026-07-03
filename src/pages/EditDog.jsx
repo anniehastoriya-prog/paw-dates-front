@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
-import { loadDogById, updateDog, uploadDogProfilePic } from "../api/dogs";
+import {
+  loadDogById,
+  updateDog,
+  uploadDogProfilePic,
+  deleteDog,
+} from "../api/dogs";
 
 export default function EditDog() {
   const { dogId } = useParams();
@@ -55,6 +60,18 @@ export default function EditDog() {
     try {
       const data = await uploadDogProfilePic(token, dogId, file);
       setProfilePic(data.profile_pic);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const tryDeleteDog = async () => {
+    const confirmed = window.confirm("Delete " + name + "?");
+    if (!confirmed) return;
+    setError(null);
+    try {
+      await deleteDog(token, dogId);
+      goToPage("/profile");
     } catch (err) {
       setError(err.message);
     }
@@ -119,6 +136,8 @@ export default function EditDog() {
           Cancel
         </button>
       </form>
+
+      <button onClick={tryDeleteDog}>Delete Dog</button>
     </section>
   );
 }
