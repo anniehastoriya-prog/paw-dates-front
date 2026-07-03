@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
-import { getMessages, sendMessage } from "../api/messages";
+import { getMessages, getConversation, sendMessage } from "../api/messages";
 import { getPlaydates, updatePlaydateStatus } from "../api/playdates";
 
 export default function Messages() {
@@ -41,6 +41,12 @@ export default function Messages() {
     }
   };
 
+  //user clicks a conversation, loads the full message thread with that person
+  const openConversation = async (c) => {
+    const data = await getConversation(token, c.senderId);
+    setSelected({ ...c, messages: data });
+  };
+
   //user sends a message in the conversation
   //refreshes the conversation list so the message appears
   const trySendMessage = async (formData) => {
@@ -79,9 +85,9 @@ export default function Messages() {
       <ul>
         {conversations.map((c) => (
           <ConversationItem
-            key={c.id}
+            key={c.senderId}
             conversation={c}
-            onClick={() => setSelected(c)}
+            onClick={() => openConversation(c)}
           />
         ))}
       </ul>

@@ -5,12 +5,18 @@ import DogCard from "../components/DogCard"; // AL's reusable card (the dog vers
 export default function Search() {
   const [dogs, setDogs] = useState([]);
 
-  // search + filter controls — 10 mile radius
   const [search, setSearch] = useState("");
   const [breed, setBreed] = useState("all");
-  const [maxDistance, setMaxDistance] = useState("10");
+  const [maxDistance, setMaxDistance] = useState("");
   const [minAge, setMinAge] = useState("");
   const [maxAge, setMaxAge] = useState("");
+
+  //used to filter, updated on search click
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [appliedBreed, setAppliedBreed] = useState("all");
+  const [appliedMaxDistance, setAppliedMaxDistance] = useState("");
+  const [appliedMinAge, setAppliedMinAge] = useState("");
+  const [appliedMaxAge, setAppliedMaxAge] = useState("");
 
   const syncDogs = async () => {
     const data = await getDogs();
@@ -27,16 +33,29 @@ export default function Search() {
     ...new Set(dogs.map((dog) => dog.breed).filter(Boolean)),
   ];
 
-  // apply the search box + each filter, then sort closest first
+  function runSearch() {
+    setAppliedSearch(search);
+    setAppliedBreed(breed);
+    setAppliedMaxDistance(maxDistance);
+    setAppliedMinAge(minAge);
+    setAppliedMaxAge(maxAge);
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Enter") runSearch();
+  }
+
   const visibleDogs = dogs
     .filter((dog) => {
-      const query = search.toLowerCase().trim();
+      const query = appliedSearch.toLowerCase().trim();
       const matchesSearch = !query || dog.name?.toLowerCase().includes(query);
-      const matchesBreed = breed === "all" || dog.breed === breed;
+      const matchesBreed = appliedBreed === "all" || dog.breed === appliedBreed;
       const matchesDistance =
-        maxDistance === "" || dog.distance <= Number(maxDistance);
-      const matchesMinAge = minAge === "" || dog.age >= Number(minAge);
-      const matchesMaxAge = maxAge === "" || dog.age <= Number(maxAge);
+        appliedMaxDistance === "" || dog.distance <= Number(appliedMaxDistance);
+      const matchesMinAge =
+        appliedMinAge === "" || dog.age >= Number(appliedMinAge);
+      const matchesMaxAge =
+        appliedMaxAge === "" || dog.age <= Number(appliedMaxAge);
       return (
         matchesSearch &&
         matchesBreed &&
@@ -57,6 +76,7 @@ export default function Search() {
         placeholder="Search dogs by name…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
 
       <div className="filters">
@@ -73,19 +93,24 @@ export default function Search() {
           placeholder="Within (mi)"
           value={maxDistance}
           onChange={(e) => setMaxDistance(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <input
           type="number"
           placeholder="Min age"
           value={minAge}
           onChange={(e) => setMinAge(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <input
           type="number"
           placeholder="Max age"
           value={maxAge}
           onChange={(e) => setMaxAge(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
+
+        <button onClick={runSearch}>Search</button>
       </div>
 
       <ul className="dog-list">

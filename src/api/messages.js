@@ -16,6 +16,21 @@ export async function getMessages(token) {
     return [];
   }
 }
+//user loads the full message thread with one specific person
+export async function getConversation(token, receiverId) {
+  try {
+    const response = await fetch(API + "/messages/" + receiverId, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
 
 //user sends a message to another user
 //stored in the database for the recipient to see

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 /** Grab the token so we can make an authorized request to the API*/
 import { useAuth } from "../auth/AuthContext";
 
 /** API helper function that fetches the logged in user's profile*/
-import { loadMyProfile } from "../api/users";
+import { loadMyProfile, loadUserById } from "../api/users";
 
 /** MessagePopup is handled by another team member, we show and hide it.*/
 import MessagePopup from "../components/MessagePopup";
@@ -17,8 +17,8 @@ export default function UserPage() {
   // Set up navigate so we can go to the other pages
   const goToPage = useNavigate();
 
+  const { id } = useParams();
   const [user, setUser] = useState(null);
-
   const [loading, setLoading] = useState(true);
 
   // showMessage controls whether the message popup is open or closed
@@ -26,16 +26,18 @@ export default function UserPage() {
 
   // useEffect runs this once when the page first loads
   useEffect(() => {
-    /** Go get the logged in user's profile from the API*/
-    async function getMyProfile() {
-      const data = await loadMyProfile(token);
+    /** If there's an id in the url, load that user; otherwise load our own profile*/
+    async function getProfile() {
+      const data = id
+        ? await loadUserById(token, id)
+        : await loadMyProfile(token);
       // Save the profile so we can show it on screen
       setUser(data);
       // We are done loading
       setLoading(false);
     }
-    getMyProfile();
-  }, [token]);
+    getProfile();
+  }, [token, id]);
 
   /** This runs when the user clicks Edit Profile*/
   function clickEditProfile() {
@@ -130,8 +132,8 @@ export default function UserPage() {
       {/* MessagePopup implementation is handled by another team member */}
       {showMessagePopup && (
         <MessagePopup
-          recipientId={user.id}
-          recipientName={user.username}
+          receiverId={user.id}
+          messages={[]}
           onClose={closeMessagePopup}
         />
       )}

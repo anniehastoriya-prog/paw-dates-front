@@ -3,7 +3,8 @@ import { useAuth } from "../auth/AuthContext";
 import { useParams, useNavigate } from "react-router";
 import MessagePopup from "../components/MessagePopup";
 import PlaydateRequestPopup from "../components/PlaydateRequestPopup";
-import { loadDogById } from "../api/dogs";
+import { loadDogById, loadDogPhotos } from "../api/dogs";
+import { loadMyProfile } from "../api/users";
 
 export default function DogPage() {
   const { dogId } = useParams();
@@ -11,6 +12,8 @@ export default function DogPage() {
   const { token } = useAuth();
 
   const [dog, setDog] = useState(null);
+  const [photos, setPhotos] = useState([]);
+  const [myUserId, setMyUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const [showPlaydateRequest, setShowPlaydateRequest] = useState(false);
@@ -21,7 +24,17 @@ export default function DogPage() {
       setDog(data);
       setLoading(false);
     }
+    async function fetchPhotos() {
+      const data = await loadDogPhotos(token, dogId);
+      setPhotos(data);
+    }
+    async function fetchMe() {
+      const data = await loadMyProfile(token);
+      setMyUserId(data.id);
+    }
     fetchDog();
+    fetchPhotos();
+    fetchMe();
   }, [token, dogId]);
 
   function clickMessage() {
@@ -63,12 +76,17 @@ export default function DogPage() {
             {dog.breed}, {dog.age} yrs, {dog.distance} mi away
           </p>
 
-          <button onClick={clickRating}>{dog.rating} paws</button>
+          <button onClick={clickRating}>{dog.ratings} paws</button>
 
           <p>{dog.description}</p>
 
           <button onClick={clickMessage}>Message</button>
           <button onClick={clickPlaydateRequest}>Request Playdate</button>
+          {dog.owner.id === myUserId && (
+            <button onClick={() => goToPage(`/dogs/${dog.id}/edit`)}>
+              Edit Dog
+            </button>
+          )}
         </div>
       </div>
 
@@ -77,16 +95,16 @@ export default function DogPage() {
         <p>{dog.owner.username}</p>
       </div>
 
+      <div className="dog-photos">
+        <h2>Photos</h2>
+        {photos.map((photo) => (
+          <img key={photo.id} src={photo.image_url} alt={dog.name} />
+        ))}
+      </div>
+
       <div id="reviews">
         <h2>Reviews</h2>
-        {dog.ratings.map((r) => (
-          <div key={r.id}>
-            <p>
-              {r.authorName}: {r.stars} paws
-            </p>
-            <p>{r.message}</p>
-          </div>
-        ))}
+        <p>Reviews coming soon.</p>
       </div>
 
       {showMessage && (
