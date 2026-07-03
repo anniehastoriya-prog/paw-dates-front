@@ -9,10 +9,12 @@ export default function DogCard({ dog }) {
 
   return (
     <div className="dog-card" onClick={clickDog}>
-      <img src={dog.profilePic} alt={dog.name} />
+      {dog.profile_pic && (
+        <img src={import.meta.env.VITE_API + dog.profile_pic} alt={dog.name} />
+      )}
       <p>{dog.name}</p>
       <p>
-        {dog.breed}, {dog.age} yrs, {dog.distance} mi away
+        {dog.breed}, {dog.age} yrs
       </p>
     </div>
   );

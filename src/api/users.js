@@ -36,3 +36,21 @@ export async function updateMyProfile(token, updates) {
   if (!response.ok) throw new Error(data.message);
   return data;
 }
+
+export async function uploadProfilePic(token, file) {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const response = await fetch(API + "/users/me/profile-pic", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    body: formData,
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw Error(result.message);
+  }
+  return result;
+}

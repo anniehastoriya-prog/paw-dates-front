@@ -55,9 +55,9 @@ export default function UserPage() {
   }
 
   /** This runs when clicking a dog card, goes to that dog's profile page*/
-  function clickDog(dogId) {
-    goToPage(`/dogs/${dogId}`);
-  }
+  const clickDog = (dogId) => {
+    goToPage("/dogs/" + dogId);
+  };
 
   // While waiting for the profile, show a loading message
   if (loading) return <p>Loading...</p>;
@@ -68,8 +68,11 @@ export default function UserPage() {
       <div className="profile-header">
         {/* Circular profile picture */}
         <div className="user-pfp">
-          {user.profilePic ? (
-            <img src={user.profilePic} alt={user.username} />
+          {user.profile_pic ? (
+            <img
+              src={import.meta.env.VITE_API + user.profile_pic}
+              alt={user.username}
+            />
           ) : (
             // Show the first letter of the username if there is no photo
             <span>{user.username.charAt(0).toUpperCase()}</span>
@@ -107,8 +110,11 @@ export default function UserPage() {
               >
                 {/* Circular dog profile picture */}
                 <div className="dog-pfp">
-                  {dog.profilePic ? (
-                    <img src={dog.profilePic} alt={dog.name} />
+                  {dog.profile_pic ? (
+                    <img
+                      src={import.meta.env.VITE_API + dog.profile_pic}
+                      alt={dog.name}
+                    />
                   ) : (
                     // Show the first letter of the dog's name if there is no photo
                     <span>{dog.name.charAt(0).toUpperCase()}</span>

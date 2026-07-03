@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
-import { loadDogById, updateDog } from "../api/dogs";
+import { loadDogById, updateDog, uploadDogProfilePic } from "../api/dogs";
 
 export default function EditDog() {
   const { dogId } = useParams();
@@ -17,7 +17,7 @@ export default function EditDog() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchDog() {
+    const syncDog = async () => {
       const data = await loadDogById(token, dogId);
       setName(data.name || "");
       setBreed(data.breed || "");
@@ -25,11 +25,12 @@ export default function EditDog() {
       setDescription(data.description || "");
       setProfilePic(data.profile_pic || "");
       setLoading(false);
-    }
-    fetchDog();
+    };
+    syncDog();
   }, [token, dogId]);
 
-  async function trySaveDog(e) {
+  //save the dog's name, breed, age, and description
+  const trySaveDog = async (e) => {
     e.preventDefault();
     setError(null);
     try {
@@ -40,11 +41,24 @@ export default function EditDog() {
         description,
         profile_pic: profilePic,
       });
-      goToPage(`/dogs/${dogId}`);
+      goToPage("/dogs/" + dogId);
     } catch (err) {
       setError(err.message);
     }
-  }
+  };
+
+  //upload a profile pic for the dog from the user's device
+  const tryUploadProfilePic = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setError(null);
+    try {
+      const data = await uploadDogProfilePic(token, dogId, file);
+      setProfilePic(data.profile_pic);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
 
@@ -84,13 +98,12 @@ export default function EditDog() {
           />
         </label>
 
+        {profilePic && (
+          <img src={import.meta.env.VITE_API + profilePic} alt={name} />
+        )}
         <label>
-          Profile picture URL
-          <input
-            type="text"
-            value={profilePic}
-            onChange={(e) => setProfilePic(e.target.value)}
-          />
+          Profile Picture
+          <input type="file" accept="image/*" onChange={tryUploadProfilePic} />
         </label>
 
         <label>
@@ -102,7 +115,7 @@ export default function EditDog() {
         </label>
 
         <button type="submit">Save</button>
-        <button type="button" onClick={() => goToPage(`/dogs/${dogId}`)}>
+        <button type="button" onClick={() => goToPage("/dogs/" + dogId)}>
           Cancel
         </button>
       </form>

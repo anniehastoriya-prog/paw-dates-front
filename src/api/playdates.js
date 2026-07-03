@@ -31,11 +31,11 @@ export async function createPlaydate(
     },
     body: JSON.stringify({ requestDogId, recipientDogId, timeslot }),
   });
-  
+  const result = await response.json();
   if (!response.ok) {
-    const result = await response.json();
     throw Error(result.message);
   }
+  return result;
 }
 
 //user can accept or decline a playdate request

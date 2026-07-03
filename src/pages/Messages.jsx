@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { getMessages, getConversation, sendMessage } from "../api/messages";
 import { getPlaydates, updatePlaydateStatus } from "../api/playdates";
+import { loadMyProfile } from "../api/users";
 
 export default function Messages() {
   const { token } = useAuth();
@@ -9,6 +10,7 @@ export default function Messages() {
   //state to store conversations, playdates, selected item, and errors
   const [conversations, setConversations] = useState([]);
   const [playdates, setPlaydates] = useState([]);
+  const [myDogIds, setMyDogIds] = useState([]);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState(null);
 
@@ -24,8 +26,15 @@ export default function Messages() {
       setPlaydates(data);
     };
 
+    const syncMe = async () => {
+      const data = await loadMyProfile(token);
+      const dogs = data.dogs || [];
+      setMyDogIds(dogs.map((dog) => dog.id));
+    };
+
     syncMessages();
     syncPlaydates();
+    syncMe();
   }, [token]);
 
   //user can accept or decline a playdate request
@@ -59,8 +68,10 @@ export default function Messages() {
         receiverId: selected.senderId,
         date,
       });
-      const data = await getMessages(token);
-      setConversations(data);
+      const conversationsData = await getMessages(token);
+      setConversations(conversationsData);
+      const threadData = await getConversation(token, selected.senderId);
+      setSelected({ ...selected, messages: threadData });
     } catch (e) {
       setError(e.message);
     }
@@ -99,6 +110,7 @@ export default function Messages() {
       {selected && !selected.messages && (
         <PlaydateDetail
           playdate={selected}
+          myDogIds={myDogIds}
           tryUpdatePlaydate={tryUpdatePlaydate}
         />
       )}
@@ -118,10 +130,15 @@ function PlaydateItem({ playdate, onClick }) {
 
 //show a single conversation item that user can click to view message thread
 function ConversationItem({ conversation, onClick }) {
+  const preview =
+    conversation.lastMessage.length > 40
+      ? conversation.lastMessage.slice(0, 40) + "..."
+      : conversation.lastMessage;
+
   return (
     <li onClick={onClick}>
       <p>{conversation.senderName}</p>
-      <p>{conversation.lastMessage}</p>
+      <p>{preview}</p>
     </li>
   );
 }
@@ -142,17 +159,27 @@ function MessageDetail({ conversation, onSendMessage }) {
   );
 }
 
-//display playdate request status and accept/decline buttons
-function PlaydateDetail({ playdate, tryUpdatePlaydate }) {
+//display playdate request status and buttons based on whether the user sent or received the request
+function PlaydateDetail({ playdate, myDogIds, tryUpdatePlaydate }) {
+  const isSender = myDogIds.includes(playdate.request_dog_id);
+
   return (
     <>
       <p>{playdate.status}</p>
-      <button onClick={() => tryUpdatePlaydate(playdate.id, "confirmed")}>
-        Accept
-      </button>
-      <button onClick={() => tryUpdatePlaydate(playdate.id, "declined")}>
-        Decline
-      </button>
+      {isSender ? (
+        <button onClick={() => tryUpdatePlaydate(playdate.id, "cancelled")}>
+          Cancel Request
+        </button>
+      ) : (
+        <>
+          <button onClick={() => tryUpdatePlaydate(playdate.id, "confirmed")}>
+            Accept
+          </button>
+          <button onClick={() => tryUpdatePlaydate(playdate.id, "declined")}>
+            Decline
+          </button>
+        </>
+      )}
     </>
   );
 }

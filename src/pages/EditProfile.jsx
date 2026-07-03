@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
-import { loadMyProfile, updateMyProfile } from "../api/users";
+import { loadMyProfile, updateMyProfile, uploadProfilePic } from "../api/users";
 import { createDog } from "../api/dogs";
 
 export default function EditProfile() {
@@ -18,16 +18,17 @@ export default function EditProfile() {
   const [dogAge, setDogAge] = useState("");
 
   useEffect(() => {
-    async function getMyProfile() {
+    const syncProfile = async () => {
       const data = await loadMyProfile(token);
       setDescription(data.description || "");
       setProfilePic(data.profile_pic || "");
       setLoading(false);
-    }
-    getMyProfile();
+    };
+    syncProfile();
   }, [token]);
 
-  async function trySaveProfile(e) {
+  /** save the user's description and profile pic */
+  const trySaveProfile = async (e) => {
     e.preventDefault();
     setError(null);
     try {
@@ -39,9 +40,23 @@ export default function EditProfile() {
     } catch (err) {
       setError(err.message);
     }
-  }
+  };
 
-  async function tryAddDog(e) {
+  /** upload a profile pic from the user's device */
+  const tryUploadProfilePic = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setError(null);
+    try {
+      const data = await uploadProfilePic(token, file);
+      setProfilePic(data.profile_pic);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  /** add a new dog tied to the user's account */
+  const tryAddDog = async (e) => {
     e.preventDefault();
     setError(null);
     try {
@@ -57,7 +72,7 @@ export default function EditProfile() {
     } catch (err) {
       setError(err.message);
     }
-  }
+  };
 
   if (loading) return <p>Loading...</p>;
 
@@ -67,13 +82,12 @@ export default function EditProfile() {
       {error && <p role="alert">{error}</p>}
 
       <form onSubmit={trySaveProfile}>
+        {profilePic && (
+          <img src={import.meta.env.VITE_API + profilePic} alt="Profile" />
+        )}
         <label>
-          Profile picture URL
-          <input
-            type="text"
-            value={profilePic}
-            onChange={(e) => setProfilePic(e.target.value)}
-          />
+          Profile Picture
+          <input type="file" accept="image/*" onChange={tryUploadProfilePic} />
         </label>
 
         <label>
