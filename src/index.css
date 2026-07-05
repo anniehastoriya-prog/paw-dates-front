@@ -1,0 +1,600 @@
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700&display=swap");
+
+/* -------------------------------------------------------------------
+   1. Design tokens — change colors in ONE place here
+   ------------------------------------------------------------------- */
+:root {
+  /* Sunset palette */
+  --sunset-cream: #f3a88c; /* page background */
+  --sunset-peach: #fcc7ff; /* soft panels */
+  --sunset-gold: #ffb65c; /* warm accent */
+  --sunset-orange: #ff8a4c; /* primary accent */
+  --sunset-coral: #ff6b6b; /* hot accent / alerts-ish */
+  --biscuit-tan: #e8c9a0; /* the biscuit background motif */
+
+  /* Ink / text (dusky plum reads well on cream) */
+  --ink: #3e2f4a;
+  --ink-soft: #6e5a82;
+  --line: #f0dcc4; /* hairline borders */
+
+  /* Signature sunset gradient — hero, buttons, accents */
+  --sunset-grad: linear-gradient(
+    135deg,
+    var(--sunset-gold) 0%,
+    var(--sunset-orange) 55%,
+    var(--sunset-coral) 100%
+  );
+
+  /* Type */
+  --font-display: "Baloo 2", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, -apple-system, sans-serif;
+
+  /* Shape & depth */
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow-soft: 0 8px 24px rgba(74, 59, 92, 0.12);
+  --shadow-lift: 0 14px 32px rgba(74, 59, 92, 0.18);
+}
+
+/* -------------------------------------------------------------------
+   2. Reset
+   ------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------
+   3. Base + paw background 
+   ------------------------------------------------------------------- */
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  line-height: 1.55;
+  min-height: 100vh;
+  background-color: #f6efe0;
+  background-image: url("/paw-bg.jpg");
+  background-repeat: repeat;
+  background-size: 1550px auto;
+  background-attachment: fixed;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* -------------------------------------------------------------------
+   4. Layout — pages render inside <section> or fragments.
+   This gives every page a centered, breathable column.
+   ------------------------------------------------------------------- */
+#root {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: 24px 20px 64px;
+}
+
+section {
+  background: rgba(255, 175, 134, 0.85);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 28px;
+  backdrop-filter: blur(2px);
+}
+
+/* -------------------------------------------------------------------
+   5. Headings
+   ------------------------------------------------------------------- */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin-bottom: 0.6em;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 1.2em 0 0.5em;
+}
+
+/* -------------------------------------------------------------------
+   6. Buttons
+   ------------------------------------------------------------------- */
+button {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #f6fffa;
+  background: var(--sunset-grad);
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 138, 76, 0.35);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    filter 0.12s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 138, 76, 0.45);
+  filter: brightness(1.03);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Secondary / Cancel buttons — use type="button" or add .ghost */
+button[type="button"],
+button.ghost {
+  background: #fff;
+  color: var(--sunset-orange);
+  border: 2px solid var(--sunset-orange);
+  box-shadow: none;
+}
+
+button[type="button"]:hover,
+button.ghost:hover {
+  background: var(--sunset-peach);
+  filter: none;
+}
+
+/* -------------------------------------------------------------------
+   7. Forms — labels wrap their inputs in your pages
+   ------------------------------------------------------------------- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 480px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--sunset-orange);
+  box-shadow: 0 0 0 3px rgba(255, 138, 76, 0.2);
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+input[type="file"] {
+  padding: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* form buttons sit inline, not full-width */
+form button {
+  align-self: flex-start;
+}
+
+/* Error / alert text */
+[role="alert"] {
+  color: #c0392b;
+  background: #fff0ee;
+  border: 1px solid #ffd6cf;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* -------------------------------------------------------------------
+   8. Search page — .search-bar, .filters, .dog-list
+   ------------------------------------------------------------------- */
+.search-bar {
+  width: 100%;
+  font-size: 1.05rem;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: #fff;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filters select,
+.filters input {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.filters button {
+  flex: 0 0 auto;
+}
+
+/* dog grid */
+.dog-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+}
+
+/* -------------------------------------------------------------------
+   9. Cards — .dog-card and .user-card
+   ------------------------------------------------------------------- */
+.dog-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.dog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+
+.dog-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+
+.dog-card p:first-of-type,
+.dog-card p:nth-of-type(1) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.dog-card p {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+/* User card — circular avatar + name */
+.user-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: var(--radius);
+  transition: transform 0.14s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-3px);
+}
+
+.user-pfp {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--sunset-grad);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.user-pfp img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-card-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------
+   10. Popups — MessagePopup & PlaydateRequestPopup render bare
+   <article> elements. They float bottom-right like a chat window.
+   ------------------------------------------------------------------- */
+article {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: min(340px, calc(100vw - 40px));
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  padding: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* the _ , X , ✉ control buttons at the top */
+article > button {
+  align-self: flex-end;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 50%;
+  background: var(--sunset-peach);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+article > button:hover {
+  background: var(--sunset-gold);
+  color: #fff;
+  filter: none;
+}
+
+/* message history list inside the popup */
+article > div {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+article > div p {
+  background: var(--sunset-peach);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+article > div p small {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+article form {
+  gap: 8px;
+}
+
+article textarea {
+  min-height: 60px;
+}
+
+/* -------------------------------------------------------------------
+   11. Welcome page (hero)
+   NOTE: your WelcomePage.jsx didn't come through, so these class
+   names are my best guess. Rename them to match your JSX, or tell me
+   your actual class names and I'll realign these instantly.
+   ------------------------------------------------------------------- */
+.welcome-page {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.welcome-logo {
+  width: min(560px, 94%);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  background: #fdf3e7;
+  padding: 16px 22px;
+  border-radius: 20px;
+  box-shadow: 0 8px 22px rgba(78, 76, 94, 0.18);
+}
+.welcome-page h1 {
+  background: var(--sunset-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.welcome-hero-photo {
+  width: 100%;
+  max-width: 640px;
+  margin: 24px auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  object-fit: cover;
+}
+
+.welcome-cta {
+  display: inline-flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* -------------------------------------------------------------------
+   12. Loading text
+   ------------------------------------------------------------------- */
+p {
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------
+   13. Responsive
+   ------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  #root {
+    padding: 16px 14px 48px;
+  }
+
+  section {
+    padding: 20px;
+  }
+
+  .dog-list {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* -------------------------------------------------------------------
+   14. Accessibility — visible focus + reduced motion
+   ------------------------------------------------------------------- */
+:focus-visible {
+  outline: 3px solid var(--sunset-orange);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+/* ===================================================================
+   Messages page — two columns, CSS only 
+   =================================================================== */
+
+/* the two lists sit side by side */
+ul:has(+ ul),
+ul:has(+ ul) + ul {
+  display: inline-block;
+  vertical-align: top;
+  width: 47%;
+  padding-left: 0;
+  margin-top: 0;
+}
+ul:has(+ ul) {
+  margin-right: 5%;
+}
+
+/* each list item becomes a card */
+ul:has(+ ul) > li,
+ul:has(+ ul) + ul > li {
+  list-style: none;
+  background: #fff;
+  border: 1px solid #f0e2d2;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 16px rgba(78, 76, 94, 0.1);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+ul:has(+ ul) > li:hover,
+ul:has(+ ul) + ul > li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(78, 76, 94, 0.16);
+}
+
+/* first <p> = the name, second <p> = status / message preview */
+ul:has(+ ul) > li > p,
+ul:has(+ ul) + ul > li > p {
+  margin: 0;
+}
+ul:has(+ ul) > li > p:first-child,
+ul:has(+ ul) + ul > li > p:first-child {
+  font-weight: 700;
+  color: #4e4c5e;
+  font-size: 1.02rem;
+}
+ul:has(+ ul) > li > p:last-child,
+ul:has(+ ul) + ul > li > p:last-child {
+  color: #7a7386;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  margin-top: 2px;
+}
+
+/* stack on narrow screens */
+@media (max-width: 680px) {
+  ul:has(+ ul),
+  ul:has(+ ul) + ul {
+    display: block;
+    width: 100%;
+    margin-right: 0;
+  }
+}
+ul:has(+ ul)::before,
+ul:has(+ ul) + ul::before {
+  display: inline-block;
+  font-family: "Baloo 2", sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #572f48;
+  background: #fdf3e7;
+  border: 1px solid #f0e2d2;
+  border-radius: 999px;
+  padding: 6px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(78, 76, 94, 0.14);
+}
+ul:has(+ ul)::before {
+  content: "Playdate Requests";
+}
+ul:has(+ ul) + ul::before {
+  content: "Messages";
+}
