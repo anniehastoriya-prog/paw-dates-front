@@ -131,13 +131,14 @@ export default function EditDog() {
           />
         </label>
 
-        <button type="submit">Save</button>
-        <button type="button" onClick={() => goToPage("/dogs/" + dogId)}>
-          Cancel
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={() => goToPage("/dogs/" + dogId)}>
+            Cancel
+          </button>
+          <button onClick={tryDeleteDog}>Delete Dog</button>
+          <button type="submit">Save</button>
+        </div>
       </form>
-
-      <button onClick={tryDeleteDog}>Delete Dog</button>
     </section>
   );
 }

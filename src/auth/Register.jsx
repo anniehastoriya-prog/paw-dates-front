@@ -22,7 +22,7 @@ export default function Register() {
   };
 
   return (
-    <>
+    <section className="auth-page">
       <h1>Register for an account</h1>
       <form action={onRegister}>
         <label>
@@ -33,10 +33,14 @@ export default function Register() {
           Password
           <input type="password" name="password" required />
         </label>
-        <button>Register</button>
+        <div className="form-actions">
+          <button>Register</button>
+          <Link to="/login" className="form-secondary-link">
+            Already have an account? Log in here.
+          </Link>
+        </div>
         {error && <output>{error}</output>}
       </form>
-      <Link to="/login">Already have an account? Log in here.</Link>
-    </>
+    </section>
   );
 }

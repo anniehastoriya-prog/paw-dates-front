@@ -111,10 +111,12 @@ export default function EditProfile() {
           />
         </label>
 
-        <button type="submit">Save</button>
-        <button type="button" onClick={() => goToPage("/profile")}>
-          Cancel
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={() => goToPage("/profile")}>
+            Cancel
+          </button>
+          <button type="submit">Save</button>
+        </div>
       </form>
 
       <h2>My Dogs</h2>
@@ -123,14 +125,14 @@ export default function EditProfile() {
           {dogs.map((dog) => (
             <div key={dog.id} className="dog-card">
               <div className="dog-pfp">
-                {dog.profile_pic ? (
-                  <img
-                    src={import.meta.env.VITE_API + dog.profile_pic}
-                    alt={dog.name}
-                  />
-                ) : (
-                  <span>{dog.name.charAt(0).toUpperCase()}</span>
-                )}
+                <img
+                  src={
+                    dog.profile_pic
+                      ? import.meta.env.VITE_API + dog.profile_pic
+                      : "/nopfp.png"
+                  }
+                  alt={dog.name}
+                />
               </div>
               <p className="dog-name">{dog.name}</p>
               <p className="dog-age">{dog.age} yrs</p>
