@@ -64,38 +64,39 @@ export default function UserPage() {
 
   return (
     <section>
-      {/* ── PROFILE HEADER: pic, description, buttons ── */}
       <div className="profile-header">
-        {/* Circular profile picture */}
-        <div className="user-pfp">
-          <img
-            src={
-              user.profile_pic
-                ? import.meta.env.VITE_API + user.profile_pic
-                : "/nopfphooman.jpg"
-            }
-            alt={user.username}
-          />
+        <div className="profile-header-top">
+          <div className="user-pfp-name">
+            <div className="user-pfp">
+              <img
+                src={
+                  user.profile_pic
+                    ? import.meta.env.VITE_API + user.profile_pic
+                    : "/nopfphooman.jpg"
+                }
+                alt={user.username}
+              />
+            </div>
+            <h1>{user.username}</h1>
+          </div>
+
+          <button onClick={clickEditProfile}>Edit Profile</button>
         </div>
 
         <div className="profile-info">
-          <h1>{user.username}</h1>
+          <div className="section-box">
+            {/* User's bio/description */}
+            <p className="user-description">
+              {user.description || "No description yet."}
+            </p>
+          </div>
 
-          {/* User's bio/description */}
-          <p className="user-description">
-            {user.description || "No description yet."}
-          </p>
-
-          {/* Edit Profile sends the user to the edit page */}
-          <button onClick={clickEditProfile}>Edit Profile</button>
-
-          {/* Message opens the popup — MessagePopup handles the rest */}
           <button onClick={clickMessage}>Message</button>
         </div>
       </div>
 
       {/* ── DOGS LIST ── */}
-      <div className="dogs-section">
+      <div className="dogs-section section-box">
         <h2>My Dogs</h2>
 
         {user.dogs && user.dogs.length > 0 ? (
@@ -120,9 +121,6 @@ export default function UserPage() {
                 </div>
 
                 {/* Dog details below the picture */}
-                <p className="dog-name">{dog.name}</p>
-                <p className="dog-age">{dog.age} yrs</p>
-                <p className="dog-description">{dog.description}</p>
               </div>
             ))}
           </div>

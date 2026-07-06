@@ -20,9 +20,8 @@ export default function Login() {
       setError(e.message);
     }
   };
-
   return (
-    <>
+    <section className="auth-page">
       <h1>Log in to your account</h1>
       <form action={onLogin}>
         <label>
@@ -33,10 +32,14 @@ export default function Login() {
           Password
           <input type="password" name="password" required />
         </label>
-        <button>Login</button>
+        <div className="form-actions">
+          <button>Login</button>
+          <Link to="/register" className="form-secondary-link">
+            Need an account? Register here.
+          </Link>
+        </div>
         {error && <output>{error}</output>}
       </form>
-      <Link to="/register">Need an account? Register here.</Link>
-    </>
+    </section>
   );
 }

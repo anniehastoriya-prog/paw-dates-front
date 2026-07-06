@@ -109,7 +109,9 @@ export default function PlaydateRequestPopup({
           <p>You've requested a playdate</p>
           <p>{sentTime}</p>
           <p>Pending</p>
-          <button onClick={tryCancelPlaydate}>Cancel Request</button>
+          <div className="popup-actions">
+            <button onClick={tryCancelPlaydate}>Cancel Request</button>
+          </div>
         </>
       )}
     </article>

@@ -42,8 +42,12 @@ export default function Navbar() {
         ) : (
           // If the user is NOT logged in, show Login and Register
           <>
-            <NavLink to="/login">Log In</NavLink>
-            <NavLink to="/register">Register</NavLink>
+            <NavLink to="/login" className="btn btn-secondary">
+              Log In
+            </NavLink>
+            <NavLink to="/register" className="btn btn-primary">
+              Register
+            </NavLink>
           </>
         )}
       </nav>

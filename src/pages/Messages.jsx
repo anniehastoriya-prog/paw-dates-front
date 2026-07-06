@@ -3,9 +3,12 @@ import { useAuth } from "../auth/AuthContext";
 import { getMessages, getConversation, sendMessage } from "../api/messages";
 import { getPlaydates, updatePlaydateStatus } from "../api/playdates";
 import { loadMyProfile } from "../api/users";
+import MessagePopup from "../components/MessagePopup";
+import { useNavigate } from "react-router";
 
 export default function Messages() {
   const { token } = useAuth();
+  const goToPage = useNavigate();
 
   //state to store conversations, playdates, selected item, and errors
   const [conversations, setConversations] = useState([]);
@@ -14,6 +17,8 @@ export default function Messages() {
   const [myUserId, setMyUserId] = useState(null);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState(null);
+  const [showPlaydateMessage, setShowPlaydateMessage] = useState(false);
+  const [messageReceiverId, setMessageReceiverId] = useState(null);
 
   //when page loads, fetch all conversations and playdate requests from backend
   useEffect(() => {
@@ -79,6 +84,11 @@ export default function Messages() {
     }
   };
 
+  const openMessageForPlaydate = (userId) => {
+    setMessageReceiverId(userId);
+    setShowPlaydateMessage(true);
+  };
+
   //render the page with playdate requests, conversations, and selected detail
   return (
     <section className="messages-page">
@@ -87,20 +97,21 @@ export default function Messages() {
 
       <div className="messages-layout">
         <div className="messages-sidebar">
-          <div className="messages-section">
+          <div className="messages-section playdate-requests-section">
             <h2>Playdate Requests</h2>
             <ul>
               {playdates.map((p) => (
                 <PlaydateItem
                   key={p.id}
                   playdate={p}
+                  myDogIds={myDogIds}
                   onClick={() => setSelected(p)}
                 />
               ))}
             </ul>
           </div>
 
-          <div className="messages-section">
+          <div className="messages-section messages-list-section">
             <h2>Messages</h2>
             <ul>
               {conversations.map((c) => (
@@ -120,6 +131,7 @@ export default function Messages() {
               conversation={selected}
               onSendMessage={trySendMessage}
               myUserId={myUserId}
+              goToPage={goToPage}
             />
           )}
 
@@ -128,6 +140,8 @@ export default function Messages() {
               playdate={selected}
               myDogIds={myDogIds}
               tryUpdatePlaydate={tryUpdatePlaydate}
+              onOpenMessage={openMessageForPlaydate}
+              goToPage={goToPage}
             />
           )}
 
@@ -136,25 +150,40 @@ export default function Messages() {
           )}
         </div>
       </div>
+
+      {showPlaydateMessage && (
+        <MessagePopup
+          receiverId={messageReceiverId}
+          messages={[]}
+          onClose={() => setShowPlaydateMessage(false)}
+        />
+      )}
     </section>
   );
 }
 
 //show a single playdate item that user can click to view details
-function PlaydateItem({ playdate, onClick }) {
+//shows the OTHER person's dog, not my own
+function PlaydateItem({ playdate, myDogIds, onClick }) {
+  const isSender = myDogIds.includes(playdate.request_dog_id);
+  const otherDogName = isSender
+    ? playdate.recipient_dog_name
+    : playdate.dogName;
+  const otherDogPic = isSender
+    ? playdate.recipientDogProfilePic
+    : playdate.dogProfilePic;
+
   return (
     <li onClick={onClick}>
       <img
         src={
-          playdate.dogProfilePic
-            ? import.meta.env.VITE_API + playdate.dogProfilePic
-            : "/nopfp.png"
+          otherDogPic ? import.meta.env.VITE_API + otherDogPic : "/nopfp.png"
         }
-        alt={playdate.dogName}
+        alt={otherDogName}
         className="message-pfp"
       />
       <div>
-        <p>{playdate.dogName}</p>
+        <p>{otherDogName}</p>
         <p>{playdate.status}</p>
       </div>
     </li>
@@ -189,10 +218,24 @@ function ConversationItem({ conversation, onClick }) {
 
 //display full message conversation and form to send new messages
 //labels each bubble by sender and lines up my messages on the right
-function MessageDetail({ conversation, onSendMessage, myUserId }) {
+function MessageDetail({ conversation, onSendMessage, myUserId, goToPage }) {
   return (
     <>
-      <h2>{conversation.senderName}</h2>
+      <div
+        className="message-detail-header"
+        onClick={() => goToPage("/users/" + conversation.senderId)}
+      >
+        <img
+          src={
+            conversation.senderProfilePic
+              ? import.meta.env.VITE_API + conversation.senderProfilePic
+              : "/nopfphooman.jpg"
+          }
+          alt={conversation.senderName}
+          className="message-pfp"
+        />
+        <h2>{conversation.senderName}</h2>
+      </div>
       <div className="message-thread">
         {conversation.messages.map((m) => {
           const isMine = m.sender_id === myUserId;
@@ -218,11 +261,75 @@ function MessageDetail({ conversation, onSendMessage, myUserId }) {
 }
 
 //display playdate request status and buttons based on whether the user sent or received the request
-function PlaydateDetail({ playdate, myDogIds, tryUpdatePlaydate }) {
+function PlaydateDetail({
+  playdate,
+  myDogIds,
+  tryUpdatePlaydate,
+  onOpenMessage,
+  goToPage,
+}) {
+  //figure out which dog and user belong to the other person, not me
   const isSender = myDogIds.includes(playdate.request_dog_id);
+  const otherUserId = isSender
+    ? playdate.recipient_user_id
+    : playdate.request_user_id;
+  const otherDogId = isSender
+    ? playdate.recipient_dog_id
+    : playdate.request_dog_id;
+  const otherDogName = isSender
+    ? playdate.recipient_dog_name
+    : playdate.dogName;
+  const otherDogPic = isSender
+    ? playdate.recipientDogProfilePic
+    : playdate.dogProfilePic;
+
+  const dogHeader = (
+    <div
+      className="message-detail-header"
+      onClick={() => goToPage("/dogs/" + otherDogId)}
+    >
+      <img
+        src={
+          otherDogPic ? import.meta.env.VITE_API + otherDogPic : "/nopfp.png"
+        }
+        alt={otherDogName}
+        className="message-pfp"
+      />
+      <h2>{otherDogName}</h2>
+    </div>
+  );
+
+  if (playdate.status === "confirmed") {
+    return (
+      <>
+        {dogHeader}
+        <p>You've agreed to a playdate!</p>
+        <button onClick={() => onOpenMessage(otherUserId)}>Message</button>
+      </>
+    );
+  }
+
+  if (playdate.status === "declined") {
+    return (
+      <>
+        {dogHeader}
+        <p>You declined this playdate request.</p>
+      </>
+    );
+  }
+
+  if (playdate.status === "cancelled") {
+    return (
+      <>
+        {dogHeader}
+        <p>This playdate request was cancelled.</p>
+      </>
+    );
+  }
 
   return (
     <>
+      {dogHeader}
       <p>{playdate.status}</p>
       {isSender ? (
         <button onClick={() => tryUpdatePlaydate(playdate.id, "cancelled")}>

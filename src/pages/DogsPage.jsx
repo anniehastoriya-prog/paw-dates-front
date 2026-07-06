@@ -27,6 +27,7 @@ export default function DogPage() {
   const [loading, setLoading] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const [showPlaydateRequest, setShowPlaydateRequest] = useState(false);
+  const [expandedPhoto, setExpandedPhoto] = useState(null);
 
   useEffect(() => {
     async function fetchDog() {
@@ -127,150 +128,170 @@ export default function DogPage() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <section>
-      <div className="dog-header">
-        <div className="dog-header-top">
-          <div className="dog-pfp">
-            <img
-              src={
-                dog.profile_pic
-                  ? import.meta.env.VITE_API + dog.profile_pic
-                  : "/nopfp.png"
-              }
-              alt={dog.name}
-            />
+    <>
+      <section>
+        <div className="dog-header">
+          <div className="dog-header-top">
+            <div className="dog-pfp-name">
+              <div className="dog-pfp">
+                <img
+                  src={
+                    dog.profile_pic
+                      ? import.meta.env.VITE_API + dog.profile_pic
+                      : "/nopfp.png"
+                  }
+                  alt={dog.name}
+                />
+              </div>
+              <div className="dog-name-breed">
+                <h1>{dog.name}</h1>
+                <p>
+                  {dog.breed}, {dog.age}
+                </p>
+              </div>
+            </div>
+
+            <div className="dog-header-right">
+              <p className="dog-rating-count" onClick={clickRating}>
+                {dog.ratings} paws
+              </p>
+              {dog.owner.id === myUserId && (
+                <button onClick={() => goToPage("/dogs/" + dog.id + "/edit")}>
+                  Edit Dog
+                </button>
+              )}
+            </div>
           </div>
 
-          <p className="dog-rating-count" onClick={clickRating}>
-            {dog.ratings} paws
-          </p>
-        </div>
+          <div className="dog-info">
+            <div className="section-box">
+              <p>{dog.description}</p>
+            </div>
 
-        <div className="dog-info">
-          <h1>{dog.name}</h1>
-          <p>
-            {dog.breed}, {dog.age} yrs
-          </p>
-
-          <p>{dog.description}</p>
-
-          {dog.owner.id !== myUserId && (
-            <>
-              <button onClick={clickMessage}>Message</button>
-              <button onClick={clickPlaydateRequest}>Request Playdate</button>
-            </>
-          )}
-          {dog.owner.id === myUserId && (
-            <button onClick={() => goToPage("/dogs/" + dog.id + "/edit")}>
-              Edit Dog
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="section-box">
-        <h2>Owner</h2>
-        <div className="owner-info" onClick={clickOwner}>
-          <img
-            src={
-              dog.owner.profilePic
-                ? import.meta.env.VITE_API + dog.owner.profilePic
-                : "/nopfphooman.jpg"
-            }
-            alt={dog.owner.username}
-          />
-        </div>
-      </div>
-
-      <div className="dog-photos section-box">
-        <h2>Photos</h2>
-        {dog.owner.id === myUserId && (
-          <label>
-            Add Photo
-            <input type="file" accept="image/*" onChange={tryUploadPhoto} />
-          </label>
-        )}
-        {photos.map((photo) => (
-          <div key={photo.id} className="dog-photo">
-            <img
-              src={import.meta.env.VITE_API + photo.image_url}
-              alt={dog.name}
-            />
-            {dog.owner.id === myUserId && (
-              <button onClick={() => tryDeletePhoto(photo.id)}>Delete</button>
+            {dog.owner.id !== myUserId && (
+              <>
+                <button onClick={clickMessage}>Message</button>
+                <button onClick={clickPlaydateRequest}>Request Playdate</button>
+              </>
             )}
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div id="reviews" className="section-box">
-        <h2>Reviews</h2>
-
-        {Number(dog.owner.id) !== Number(myUserId) && (
-          <form onSubmit={trySubmitRating}>
-            <label>
-              Paws
-              <div className="paw-rating">
-                {[1, 2, 3, 4, 5].map((num) => (
-                  <span
-                    key={num}
-                    onClick={() => setNewPaws(num)}
-                    style={{
-                      cursor: "pointer",
-                      opacity: num <= newPaws ? 1 : 0.3,
-                    }}
-                  >
-                    🐾
-                  </span>
-                ))}
-              </div>
-            </label>
-            <textarea
-              value={newComments}
-              onChange={(e) => setNewComments(e.target.value)}
-              placeholder="Leave a review..."
-              required
+        <div className="section-box">
+          <h2>Owner</h2>
+          <div className="owner-info" onClick={clickOwner}>
+            <img
+              src={
+                dog.owner.profilePic
+                  ? import.meta.env.VITE_API + dog.owner.profilePic
+                  : "/nopfphooman.jpg"
+              }
+              alt={dog.owner.username}
             />
-            <button type="submit">Submit Review</button>
-          </form>
-        )}
+          </div>
+        </div>
 
-        {ratings.length === 0 ? (
-          <p>No reviews yet.</p>
-        ) : (
-          <div className="review-list">
-            {ratings.map((r) => (
-              <div key={r.id} className="review-card">
-                <div className="review-header">
-                  <p className="review-author">{r.authorName}</p>
-                  <p className="review-paws">{"🐾".repeat(r.paws)}</p>
-                </div>
-                <p className="review-comment">{r.comments}</p>
-                {r.author_id === myUserId && (
-                  <button type="button" onClick={() => tryDeleteRating(r.id)}>
+        <div className="dog-photos section-box">
+          <h2>Photos</h2>
+          {dog.owner.id === myUserId && (
+            <label>
+              Add Photo
+              <input type="file" accept="image/*" onChange={tryUploadPhoto} />
+            </label>
+          )}
+          <div className="dog-photo-grid">
+            {photos.map((photo) => (
+              <div key={photo.id} className="dog-photo">
+                <img
+                  src={import.meta.env.VITE_API + photo.image_url}
+                  alt={dog.name}
+                  onClick={() => setExpandedPhoto(photo.image_url)}
+                />
+                {dog.owner.id === myUserId && (
+                  <button onClick={() => tryDeletePhoto(photo.id)}>
                     Delete
                   </button>
                 )}
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
 
-      {showMessage && (
-        <MessagePopup
-          receiverId={dog.owner.id}
-          messages={[]}
-          onClose={closeMessage}
-        />
+        <div id="reviews" className="section-box">
+          <h2>Reviews</h2>
+
+          {Number(dog.owner.id) !== Number(myUserId) && (
+            <form onSubmit={trySubmitRating}>
+              <label>
+                Paws
+                <div className="paw-rating">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <span
+                      key={num}
+                      onClick={() => setNewPaws(num)}
+                      style={{
+                        cursor: "pointer",
+                        opacity: num <= newPaws ? 1 : 0.3,
+                      }}
+                    >
+                      🐾
+                    </span>
+                  ))}
+                </div>
+              </label>
+              <textarea
+                value={newComments}
+                onChange={(e) => setNewComments(e.target.value)}
+                placeholder="Leave a review..."
+                required
+              />
+              <button type="submit">Submit Review</button>
+            </form>
+          )}
+
+          {ratings.length === 0 ? (
+            <p>No reviews yet.</p>
+          ) : (
+            <div className="review-list">
+              {ratings.map((r) => (
+                <div key={r.id} className="review-card">
+                  <div className="review-header">
+                    <p className="review-author">{r.authorName}</p>
+                    <p className="review-paws">{"🐾".repeat(r.paws)}</p>
+                  </div>
+                  <p className="review-comment">{r.comments}</p>
+                  {r.author_id === myUserId && (
+                    <button type="button" onClick={() => tryDeleteRating(r.id)}>
+                      Delete
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {showMessage && (
+          <MessagePopup
+            receiverId={dog.owner.id}
+            messages={[]}
+            onClose={closeMessage}
+          />
+        )}
+        {showPlaydateRequest && (
+          <PlaydateRequestPopup
+            myDogs={myDogs}
+            recipientDogId={dog.id}
+            onClose={closePlaydateRequest}
+          />
+        )}
+      </section>
+
+      {expandedPhoto && (
+        <div className="photo-lightbox" onClick={() => setExpandedPhoto(null)}>
+          <img src={import.meta.env.VITE_API + expandedPhoto} alt={dog.name} />
+        </div>
       )}
-      {showPlaydateRequest && (
-        <PlaydateRequestPopup
-          myDogs={myDogs}
-          recipientDogId={dog.id}
-          onClose={closePlaydateRequest}
-        />
-      )}
-    </section>
+    </>
   );
 }
