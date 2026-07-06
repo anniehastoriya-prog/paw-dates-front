@@ -68,15 +68,14 @@ export default function UserPage() {
       <div className="profile-header">
         {/* Circular profile picture */}
         <div className="user-pfp">
-          {user.profile_pic ? (
-            <img
-              src={import.meta.env.VITE_API + user.profile_pic}
-              alt={user.username}
-            />
-          ) : (
-            // Show the first letter of the username if there is no photo
-            <span>{user.username.charAt(0).toUpperCase()}</span>
-          )}
+          <img
+            src={
+              user.profile_pic
+                ? import.meta.env.VITE_API + user.profile_pic
+                : "/nopfphooman.jpg"
+            }
+            alt={user.username}
+          />
         </div>
 
         <div className="profile-info">
@@ -110,15 +109,14 @@ export default function UserPage() {
               >
                 {/* Circular dog profile picture */}
                 <div className="dog-pfp">
-                  {dog.profile_pic ? (
-                    <img
-                      src={import.meta.env.VITE_API + dog.profile_pic}
-                      alt={dog.name}
-                    />
-                  ) : (
-                    // Show the first letter of the dog's name if there is no photo
-                    <span>{dog.name.charAt(0).toUpperCase()}</span>
-                  )}
+                  <img
+                    src={
+                      dog.profile_pic
+                        ? import.meta.env.VITE_API + dog.profile_pic
+                        : "/nopfp.png"
+                    }
+                    alt={dog.name}
+                  />
                 </div>
 
                 {/* Dog details below the picture */}

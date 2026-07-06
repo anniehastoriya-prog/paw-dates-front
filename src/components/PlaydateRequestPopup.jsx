@@ -67,9 +67,11 @@ export default function PlaydateRequestPopup({
   //show confirmation message and cancel request button after sent
   return (
     <article>
-      <button onClick={() => setMinimized(true)}>_</button>
-      <button onClick={onClose}>X</button>
-      <button onClick={() => goToPage("/messages")}>✉</button>
+      <div className="popup-controls">
+        <button onClick={() => setMinimized(true)}>_</button>
+        <button onClick={onClose}>X</button>
+        <button onClick={() => goToPage("/messages")}>✉</button>
+      </div>
 
       <h2>Request Playdate</h2>
       {error && <p role="alert">{error}</p>}
@@ -95,10 +97,12 @@ export default function PlaydateRequestPopup({
             onChange={(e) => setTimeslot(e.target.value)}
             required
           />
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
-          <button onClick={tryCreatePlaydate}>Send</button>
+          <div className="popup-actions">
+            <button type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <button onClick={tryCreatePlaydate}>Send</button>
+          </div>
         </>
       ) : (
         <>

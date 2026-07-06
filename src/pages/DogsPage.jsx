@@ -129,13 +129,21 @@ export default function DogPage() {
   return (
     <section>
       <div className="dog-header">
-        <div className="dog-pfp">
-          {dog.profile_pic && (
+        <div className="dog-header-top">
+          <div className="dog-pfp">
             <img
-              src={import.meta.env.VITE_API + dog.profile_pic}
+              src={
+                dog.profile_pic
+                  ? import.meta.env.VITE_API + dog.profile_pic
+                  : "/nopfp.png"
+              }
               alt={dog.name}
             />
-          )}
+          </div>
+
+          <p className="dog-rating-count" onClick={clickRating}>
+            {dog.ratings} paws
+          </p>
         </div>
 
         <div className="dog-info">
@@ -143,8 +151,6 @@ export default function DogPage() {
           <p>
             {dog.breed}, {dog.age} yrs
           </p>
-
-          <button onClick={clickRating}>{dog.ratings} paws</button>
 
           <p>{dog.description}</p>
 
@@ -162,18 +168,21 @@ export default function DogPage() {
         </div>
       </div>
 
-      <h2>Owner</h2>
-      <div className="owner-info" onClick={clickOwner}>
-        {dog.owner.profilePic && (
+      <div className="section-box">
+        <h2>Owner</h2>
+        <div className="owner-info" onClick={clickOwner}>
           <img
-            src={import.meta.env.VITE_API + dog.owner.profilePic}
+            src={
+              dog.owner.profilePic
+                ? import.meta.env.VITE_API + dog.owner.profilePic
+                : "/nopfphooman.jpg"
+            }
             alt={dog.owner.username}
           />
-        )}
-        <p>{dog.owner.username}</p>
+        </div>
       </div>
 
-      <div className="dog-photos">
+      <div className="dog-photos section-box">
         <h2>Photos</h2>
         {dog.owner.id === myUserId && (
           <label>
@@ -194,7 +203,7 @@ export default function DogPage() {
         ))}
       </div>
 
-      <div id="reviews">
+      <div id="reviews" className="section-box">
         <h2>Reviews</h2>
 
         {Number(dog.owner.id) !== Number(myUserId) && (
@@ -229,17 +238,22 @@ export default function DogPage() {
         {ratings.length === 0 ? (
           <p>No reviews yet.</p>
         ) : (
-          ratings.map((r) => (
-            <div key={r.id}>
-              <p>
-                {r.authorName}: {r.paws} paws
-              </p>
-              <p>{r.comments}</p>
-              {r.author_id === myUserId && (
-                <button onClick={() => tryDeleteRating(r.id)}>Delete</button>
-              )}
-            </div>
-          ))
+          <div className="review-list">
+            {ratings.map((r) => (
+              <div key={r.id} className="review-card">
+                <div className="review-header">
+                  <p className="review-author">{r.authorName}</p>
+                  <p className="review-paws">{"🐾".repeat(r.paws)}</p>
+                </div>
+                <p className="review-comment">{r.comments}</p>
+                {r.author_id === myUserId && (
+                  <button type="button" onClick={() => tryDeleteRating(r.id)}>
+                    Delete
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

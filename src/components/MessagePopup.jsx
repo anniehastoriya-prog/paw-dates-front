@@ -24,8 +24,10 @@ export default function MessagePopup({ receiverId, messages, onClose }) {
   if (minimized) {
     return (
       <article>
-        <button onClick={() => setMinimized(false)}>_</button>
-        <button onClick={onClose}>X</button>
+        <div className="popup-controls">
+          <button onClick={() => setMinimized(false)}>_</button>
+          <button onClick={onClose}>X</button>
+        </div>
       </article>
     );
   }
@@ -33,9 +35,11 @@ export default function MessagePopup({ receiverId, messages, onClose }) {
   //render full popup with message history and send form
   return (
     <article>
-      <button onClick={() => setMinimized(true)}>_</button>
-      <button onClick={onClose}>X</button>
-      <button onClick={() => goToPage("/messages")}>✉</button>
+      <div className="popup-controls">
+        <button onClick={() => setMinimized(true)}>_</button>
+        <button onClick={onClose}>X</button>
+        <button onClick={() => goToPage("/messages")}>✉</button>
+      </div>
 
       <h2>Message</h2>
       <div>
