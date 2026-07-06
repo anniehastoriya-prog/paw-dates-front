@@ -6,7 +6,7 @@
 :root {
   /* Sunset palette */
   --sunset-cream: #f3a88c; /* page background */
-  --sunset-peach: #fcc7ff; /* soft panels */
+  --sunset-peach: #fff7f5; /* soft panels */
   --sunset-gold: #ffb65c; /* warm accent */
   --sunset-orange: #ff8a4c; /* primary accent */
   --sunset-coral: #ff6b6b; /* hot accent / alerts-ish */
@@ -58,7 +58,7 @@ body {
   line-height: 1.55;
   min-height: 100vh;
   background-color: #f6efe0;
-  background-image: url("/paw-bg.jpg");
+  /*background-image: url("/paw-bg.jpg"); low resolution and hard to see*/
   background-repeat: repeat;
   background-size: 1550px auto;
   background-attachment: fixed;
@@ -79,7 +79,7 @@ img {
 }
 
 section {
-  background: rgba(255, 175, 134, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
@@ -256,7 +256,8 @@ form button {
   flex: 0 0 auto;
 }
 
-/* dog grid */
+/*
+ dog grid 
 .dog-list {
   list-style: none;
   padding: 0;
@@ -264,10 +265,9 @@ form button {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 18px;
 }
-
-/* -------------------------------------------------------------------
+ -------------------------------------------------------------------
    9. Cards — .dog-card and .user-card
-   ------------------------------------------------------------------- */
+   ------------------------------------------------------------------- 
 .dog-card {
   background: #fff;
   border: 1px solid var(--line);
@@ -306,6 +306,7 @@ form button {
   color: var(--ink-soft);
   font-size: 0.9rem;
 }
+*/
 
 /* User card — circular avatar + name */
 .user-card {
@@ -324,8 +325,8 @@ form button {
 }
 
 .user-pfp {
-  width: 84px;
-  height: 84px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   overflow: hidden;
   display: grid;
@@ -337,7 +338,6 @@ form button {
   font-size: 2rem;
   box-shadow: var(--shadow-soft);
 }
-
 .user-pfp img {
   width: 100%;
   height: 100%;
@@ -379,13 +379,13 @@ article > button {
   font-size: 1rem;
   line-height: 1;
   border-radius: 50%;
-  background: var(--sunset-peach);
-  color: var(--ink);
+  background: var(--sunset-orange);
+  color: #fff;
   box-shadow: none;
 }
 
 article > button:hover {
-  background: var(--sunset-gold);
+  background: var(--sunset-coral);
   color: #fff;
   filter: none;
 }
@@ -432,16 +432,18 @@ article textarea {
   padding: 48px 20px;
 }
 
+/*
 .welcome-logo {
   width: min(560px, 94%);
   height: auto;
   display: block;
   margin: 0 auto;
-  background: #fdf3e7;
+  background: #fdf3e7;         new welcome logo css at the bottom 
   padding: 16px 22px;
   border-radius: 20px;
   box-shadow: 0 8px 22px rgba(78, 76, 94, 0.18);
-}
+  */
+
 .welcome-page h1 {
   background: var(--sunset-grad);
   -webkit-background-clip: text;
@@ -597,4 +599,296 @@ ul:has(+ ul)::before {
 }
 ul:has(+ ul) + ul::before {
   content: "Messages";
+}
+
+/*------------------------------------------------------*/
+
+/*navbar*/
+#navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+}
+
+#brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+#brand img {
+  height: 5rem;
+}
+
+#navbar nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/*main page*/
+.welcome-description p {
+  font-size: 1.3rem;
+  font-family: cursive;
+}
+
+.card {
+  max-width: 70rem;
+  margin: 2rem auto;
+  background-color: #fdf3e7;
+  padding: 3rem;
+  border-radius: 1.25rem;
+  text-align: center;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  color: #ff8a4c;
+}
+
+.welcome-logo {
+  width: min(400px, 94%);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/*dog card*/
+
+.dog-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #ffffffdc;
+  border-radius: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.dog-pfp {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--sunset-orange);
+}
+
+.dog-pfp img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dog-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dog-card-info {
+  min-width: 0;
+  text-align: left;
+}
+
+.dog-card-info p:first-child {
+  font-weight: 1000;
+}
+
+.dog-card-info p:last-child {
+  color: rgb(144, 144, 144);
+}
+
+.section-box {
+  background: #fdf3e7;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+/*dog reviews*/
+
+.dog-header .dog-pfp {
+  width: 140px;
+  height: 140px;
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.review-card {
+  background: #ffffffa4;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+#reviews form button {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+}
+
+.review-card button {
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  float: right;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-author {
+  font-weight: 700;
+}
+
+.review-comment {
+  margin-top: 0.5rem;
+  color: gray;
+}
+
+/*owner*/
+.owner-info img {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--sunset-orange);
+}
+
+/*popups*/
+
+.popup-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 9px;
+  align-self: flex-end;
+  margin-top: 15px;
+}
+
+.popup-controls button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 50%;
+  background: var(--sunset-orange);
+  color: #fff;
+  box-shadow: none;
+}
+
+.popup-controls button:hover {
+  background: var(--sunset-coral);
+  filter: none;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.popup-actions button {
+  flex: 1;
+}
+
+/*messages*/
+.messages-section li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.message-pfp {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--sunset-orange);
+  flex-shrink: 0;
+}
+
+.messages-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.messages-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 22rem;
+  flex-shrink: 0;
+}
+
+.messages-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.messages-section li {
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+}
+
+.messages-section li:hover {
+  background: #fdf3e7;
+}
+
+.messages-detail {
+  flex: 1;
+  background: #fdf3e7;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.message-bubble-wrap {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+}
+
+.message-bubble-wrap.mine {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message-bubble-wrap.theirs {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.message-sender-label {
+  font-size: 0.75rem;
+  color: gray;
+  margin-bottom: 2px;
+}
+
+.message-bubble {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 0.6rem 1rem;
+}
+
+.mine .message-bubble {
+  background: var(--sunset-orange);
+  color: #fff;
+}
+
+.message-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
 }

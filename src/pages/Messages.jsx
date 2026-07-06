@@ -11,6 +11,7 @@ export default function Messages() {
   const [conversations, setConversations] = useState([]);
   const [playdates, setPlaydates] = useState([]);
   const [myDogIds, setMyDogIds] = useState([]);
+  const [myUserId, setMyUserId] = useState(null);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState(null);
 
@@ -30,6 +31,7 @@ export default function Messages() {
       const data = await loadMyProfile(token);
       const dogs = data.dogs || [];
       setMyDogIds(dogs.map((dog) => dog.id));
+      setMyUserId(data.id);
     };
 
     syncMessages();
@@ -79,42 +81,62 @@ export default function Messages() {
 
   //render the page with playdate requests, conversations, and selected detail
   return (
-    <>
+    <section className="messages-page">
       <h1>Messages</h1>
       {error && <p role="alert">{error}</p>}
 
-      <ul>
-        {playdates.map((p) => (
-          <PlaydateItem
-            key={p.id}
-            playdate={p}
-            onClick={() => setSelected(p)}
-          />
-        ))}
-      </ul>
+      <div className="messages-layout">
+        <div className="messages-sidebar">
+          <div className="messages-section">
+            <h2>Playdate Requests</h2>
+            <ul>
+              {playdates.map((p) => (
+                <PlaydateItem
+                  key={p.id}
+                  playdate={p}
+                  onClick={() => setSelected(p)}
+                />
+              ))}
+            </ul>
+          </div>
 
-      <ul>
-        {conversations.map((c) => (
-          <ConversationItem
-            key={c.senderId}
-            conversation={c}
-            onClick={() => openConversation(c)}
-          />
-        ))}
-      </ul>
+          <div className="messages-section">
+            <h2>Messages</h2>
+            <ul>
+              {conversations.map((c) => (
+                <ConversationItem
+                  key={c.senderId}
+                  conversation={c}
+                  onClick={() => openConversation(c)}
+                />
+              ))}
+            </ul>
+          </div>
+        </div>
 
-      {selected && selected.messages && (
-        <MessageDetail conversation={selected} onSendMessage={trySendMessage} />
-      )}
+        <div className="messages-detail">
+          {selected && selected.messages && (
+            <MessageDetail
+              conversation={selected}
+              onSendMessage={trySendMessage}
+              myUserId={myUserId}
+            />
+          )}
 
-      {selected && !selected.messages && (
-        <PlaydateDetail
-          playdate={selected}
-          myDogIds={myDogIds}
-          tryUpdatePlaydate={tryUpdatePlaydate}
-        />
-      )}
-    </>
+          {selected && !selected.messages && (
+            <PlaydateDetail
+              playdate={selected}
+              myDogIds={myDogIds}
+              tryUpdatePlaydate={tryUpdatePlaydate}
+            />
+          )}
+
+          {!selected && (
+            <p>Select a playdate request or a conversation to view details.</p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -122,8 +144,19 @@ export default function Messages() {
 function PlaydateItem({ playdate, onClick }) {
   return (
     <li onClick={onClick}>
-      <p>{playdate.dogName}</p>
-      <p>{playdate.status}</p>
+      <img
+        src={
+          playdate.dogProfilePic
+            ? import.meta.env.VITE_API + playdate.dogProfilePic
+            : "/nopfp.png"
+        }
+        alt={playdate.dogName}
+        className="message-pfp"
+      />
+      <div>
+        <p>{playdate.dogName}</p>
+        <p>{playdate.status}</p>
+      </div>
     </li>
   );
 }
@@ -137,20 +170,45 @@ function ConversationItem({ conversation, onClick }) {
 
   return (
     <li onClick={onClick}>
-      <p>{conversation.senderName}</p>
-      <p>{preview}</p>
+      <img
+        src={
+          conversation.senderProfilePic
+            ? import.meta.env.VITE_API + conversation.senderProfilePic
+            : "/nopfphooman.jpg"
+        }
+        alt={conversation.senderName}
+        className="message-pfp"
+      />
+      <div>
+        <p>{conversation.senderName}</p>
+        <p>{preview}</p>
+      </div>
     </li>
   );
 }
 
 //display full message conversation and form to send new messages
-function MessageDetail({ conversation, onSendMessage }) {
+//labels each bubble by sender and lines up my messages on the right
+function MessageDetail({ conversation, onSendMessage, myUserId }) {
   return (
     <>
       <h2>{conversation.senderName}</h2>
-      {conversation.messages.map((m) => (
-        <p key={m.id}>{m.content}</p>
-      ))}
+      <div className="message-thread">
+        {conversation.messages.map((m) => {
+          const isMine = m.sender_id === myUserId;
+          return (
+            <div
+              key={m.id}
+              className={"message-bubble-wrap " + (isMine ? "mine" : "theirs")}
+            >
+              <p className="message-sender-label">
+                {isMine ? "You" : conversation.senderName}
+              </p>
+              <p className="message-bubble">{m.content}</p>
+            </div>
+          );
+        })}
+      </div>
       <form action={onSendMessage}>
         <textarea name="message" required />
         <button>Send</button>

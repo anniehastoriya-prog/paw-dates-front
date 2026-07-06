@@ -27,7 +27,7 @@ export default function Navbar() {
   return (
     <header id="navbar">
       <NavLink id="brand" to="/">
-        <p>Paw Dates 🐾</p>
+        <img src="/logo.png" alt="Paw Dates logo" />
       </NavLink>
 
       <nav>
